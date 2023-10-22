@@ -1,0 +1,84 @@
+#
+# ~/.bash_aliases
+#
+# enable vi mode
+set -o vi
+# clear screen in bash vi mode
+bind -m vi-insert "\C-l":clear-screen
+# disable ctrl-s & ctrl-q
+stty -ixon -ixoff
+# command aliases
+alias ls='ls --color=auto'
+alias psc='ps xawf -eo pid,user,cgroup,args'
+# specifically to deal with SSH & tmux on remote systems
+alias ssh='TERM=screen-256color && ssh'
+alias view='nvim -R'
+alias xcb='xclip -i -selection clipboard'
+# ssh tunnel - see ~/.ssh/config
+#alias terrific_tunnel="autossh -M 0 -f -qCNT4 terrific_tunnel"
+#alias terrific_tunnel="ssh -fqCNT4 tunnel.terrific"
+# customer exports
+export EDITOR=nvim
+export PAGER=less
+export VISUAL="$EDITOR"
+export SUDO_EDITOR="$EDITOR"
+export FCEDIT="$EDITOR"
+# pin entry always use curses
+export PINENTRY_USER_DATA="USE_CURSES=1"
+# java options
+export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel'
+# bash options for duplicates in history & to ignore commands that start with a space ;)
+export HISTCONTROL=ignoredups:erasedups:ignorespace
+# When the shell exits, append to the history file instead of overwriting it
+shopt -s histappend
+# After each command, append to the history file and reread it
+#PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -c; history -r"
+
+# TODO: Follow up, use or remove
+# for python virtualenvs 
+if [ -d "${HOME}/.virtualenvs" ] ; then
+    export WORKON_HOME=~/.virtualenvs
+    source /usr/bin/virtualenvwrapper_lazy.sh
+fi
+
+# for keychain
+if [ -f "${HOME}/.keychain/${HOSTNAME}-sh" ] ; then
+    source "${HOME}/.keychain/${HOSTNAME}-sh"
+fi
+
+# for personal scripts
+if [ -d "${HOME}/bin" ] ; then
+    PATH="${HOME}/bin:${HOME}/.local/bin:${PATH}"
+fi
+
+# for pass
+export GNUPGHOME=${HOME}/.gnupg
+
+# for git shell expansion
+find_git_branch () {
+    local dir=. head
+    until [ "$dir" -ef / ]; do
+        if [ -f "$dir/.git/HEAD" ]; then
+            head=$(< "$dir/.git/HEAD")
+            if [[ $head == ref:\ refs/heads/* ]]; then
+                git_branch=" ${head#*/*/}"
+            elif [[ $head != '' ]]; then
+                git_branch=' (detached)'
+            else
+                git_branch=' (unknown)'
+            fi
+            return
+        fi
+        dir="../$dir"
+    done
+    git_branch=''
+}
+
+PROMPT_COMMAND="find_git_branch; $PROMPT_COMMAND"
+green=$'\e[1;32m'
+magenta=$'\e[1;35m'
+normal_colours=$'\e[m'
+# original
+#PS1="\[$green\]\h:\w\[$magenta\]\$git_branch\[$green\] \\n\\$\[$normal_colours\] "
+# updated
+PS1="\[$green\]\h:\w\[$magenta\]\$git_branch\[$green\] \\n\\$\[$normal_colours\] "
