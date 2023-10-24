@@ -20,7 +20,11 @@ Plug 'pearofducks/ansible-vim', { 'do': './UltiSnips/generate.sh' }
 Plug 'ap/vim-buftabline'
 " terraform support
 Plug 'hashivim/vim-terraform'
+" dracula theme
+Plug 'dracula/vim', { 'as': 'dracula' }
 call plug#end()
+" set theme
+colorscheme dracula
 " Don't show mode in statusline
 set noshowmode
 " Always show statusline
