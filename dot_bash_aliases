@@ -82,3 +82,10 @@ normal_colours=$'\e[m'
 #PS1="\[$green\]\h:\w\[$magenta\]\$git_branch\[$green\] \\n\\$\[$normal_colours\] "
 # updated
 PS1="\[$green\]\h:\w\[$magenta\]\$git_branch\[$green\] \\n\\$\[$normal_colours\] "
+
+# kubernetes completion
+#source <(kubectl completion bash) # set up autocomplete in bash into the current shell, bash-completion package should be installed first.
+alias k=kubectl
+complete -o default -F __start_kubectl k
+# aws completion
+complete -C '/usr/local/bin/aws_completer' aws
