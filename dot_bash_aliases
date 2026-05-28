@@ -1,61 +1,59 @@
-#
 # ~/.bash_aliases
-#
-# enable vi mode
+# ============================================================================
+
+# --- Shell Mode ----------------------------------------------------------------
 set -o vi
-# clear screen in bash vi mode
 bind -m vi-insert "\C-l":clear-screen
-# disable ctrl-s & ctrl-q
-stty -ixon -ixoff
-# command aliases
-alias ls='ls --color=auto'
-alias psc='ps xawf -eo pid,user,cgroup,args'
-# specifically to deal with SSH & tmux on remote systems
-alias ssh='TERM=screen-256color && ssh'
-alias view='nvim -R'
-alias xcb='xclip -i -selection clipboard'
-# ssh tunnel - see ~/.ssh/config
-#alias terrific_tunnel="autossh -M 0 -f -qCNT4 terrific_tunnel"
-#alias terrific_tunnel="ssh -fqCNT4 tunnel.terrific"
-# customer exports
+stty -ixon -ixoff                          # disable ctrl-s / ctrl-q flow control
+
+# --- Exports -------------------------------------------------------------------
 export EDITOR=nvim
-export PAGER=less
 export VISUAL="$EDITOR"
 export SUDO_EDITOR="$EDITOR"
 export FCEDIT="$EDITOR"
-# pin entry always use curses
-export PINENTRY_USER_DATA="USE_CURSES=1"
-# java options
-export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel'
-# bash options for duplicates in history & to ignore commands that start with a space ;)
+export PAGER=less
+
 export HISTCONTROL=ignoredups:erasedups:ignorespace
-# When the shell exits, append to the history file instead of overwriting it
-shopt -s histappend
-# After each command, append to the history file and reread it
-#PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -c; history -r"
+export HISTSIZE=10000
+export HISTFILESIZE=10000
 
-# TODO: Follow up, use or remove
-# for python virtualenvs 
-if [ -d "${HOME}/.virtualenvs" ] ; then
-    export WORKON_HOME=~/.virtualenvs
-    source /usr/bin/virtualenvwrapper_lazy.sh
-fi
+export GNUPGHOME="${HOME}/.gnupg"
+export PINENTRY_USER_DATA="USE_CURSES=1"
 
-# for keychain
-if [ -f "${HOME}/.keychain/${HOSTNAME}-sh" ] ; then
-    source "${HOME}/.keychain/${HOSTNAME}-sh"
-fi
+export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel'
 
-# for personal scripts
-if [ -d "${HOME}/bin" ] ; then
-    PATH="${HOME}/bin:${HOME}/.local/bin:${PATH}"
-fi
+# --- Shell Options -------------------------------------------------------------
+shopt -s histappend                         # append to history, don't overwrite
 
-# for pass
-export GNUPGHOME=${HOME}/.gnupg
+# --- PATH ----------------------------------------------------------------------
+for dir in "${HOME}/bin" "${HOME}/.local/bin"; do
+    if [ -d "$dir" ]; then
+        case ":${PATH}:" in
+            *:"$dir":*) ;;                  # already in PATH
+            *) PATH="${PATH}:${dir}" ;;
+        esac
+    fi
+done
+unset dir
 
-# for git shell expansion
-find_git_branch () {
+# --- Aliases -------------------------------------------------------------------
+alias ls='ls --color=auto'
+alias psc='ps xawf -eo pid,user,cgroup,args'
+alias ssh='TERM=screen-256color ssh'        # fix: removed && (was broken)
+alias view='nvim -R'
+alias xcb='xclip -i -selection clipboard'
+alias claude-sandbox='distrobox enter claude-dev -- claude'
+
+function unchain() {
+    if [ -f "${HOME}/.keychain/${HOSTNAME}-sh" ]; then
+        source "${HOME}/.keychain/${HOSTNAME}-sh"
+    fi
+    keychain ~/.ssh/terrific
+}
+
+# --- Git Branch in Prompt ------------------------------------------------------
+# Your original function works well. Keeping it for portability.
+find_git_branch() {
     local dir=. head
     until [ "$dir" -ef / ]; do
         if [ -f "$dir/.git/HEAD" ]; then
@@ -74,18 +72,17 @@ find_git_branch () {
     git_branch=''
 }
 
-PROMPT_COMMAND="find_git_branch; $PROMPT_COMMAND"
+# --- Prompt --------------------------------------------------------------------
 green=$'\e[1;32m'
 magenta=$'\e[1;35m'
-normal_colours=$'\e[m'
-# original
-#PS1="\[$green\]\h:\w\[$magenta\]\$git_branch\[$green\] \\n\\$\[$normal_colours\] "
-# updated
-PS1="\[$green\]\h:\w\[$magenta\]\$git_branch\[$green\] \\n\\$\[$normal_colours\] "
+normal=$'\e[m'
 
-# kubernetes completion
-#source <(kubectl completion bash) # set up autocomplete in bash into the current shell, bash-completion package should be installed first.
+PROMPT_COMMAND="find_git_branch; $PROMPT_COMMAND"
+PS1="\[$green\]\h:\w\[$magenta\]\$git_branch\[$green\]\n\\$\[$normal\] "
+
+# --- Completions ---------------------------------------------------------------
+source <(kubectl completion bash) 2>/dev/null
 alias k=kubectl
 complete -o default -F __start_kubectl k
-# aws completion
-complete -C '/usr/local/bin/aws_completer' aws
+
+complete -C '/usr/local/bin/aws_completer' aws 2>/dev/null
