@@ -8,8 +8,15 @@ Configuration files:
 .
 ├── dot_bash_aliases
 ├── dot_inputrc
+├── dot_tmux.conf
 ├── private_dot_config
 │   └── nvim
-│       └── init.vim
-└── README
+│       ├── init.lua
+│       └── lua
+│           ├── autocmds.lua
+│           ├── mappings.lua
+│           ├── options.lua
+│           └── plugins
+│               └── custom.lua
+└── README.md
 ```
