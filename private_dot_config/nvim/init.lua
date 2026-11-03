@@ -23,6 +23,7 @@ require("lazy").setup({
     import = "nvchad.plugins",
   },
   { import = "plugins" },
+  { 'jpalardy/vim-slime' },
 }, lazy_config)
 
 -- load theme
@@ -32,7 +33,7 @@ dofile(vim.g.base46_cache .. "statusline")
 require "options"
 require "nvchad.autocmds"
 require "autocmds"
-require "slime"
+-- require "slime"
 
 -- mappings load after NvChad's, so yours win any conflict
 vim.schedule(function()

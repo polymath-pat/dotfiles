@@ -1,8 +1,15 @@
--- Your own plugins. lazy.nvim loads every file in lua/plugins/,
--- so this sits alongside NvChad's starter lua/plugins/init.lua.
+-- ~/.config/nvim/lua/plugins/custom.lua
 return {
-  -- send text to tmux (replaces tslime; config stays in lua/slime.lua)
-  { "jpalardy/vim-slime", lazy = false },
+  -- send text to tmux
+  {
+    "jpalardy/vim-slime",
+    lazy = false,
+    init = function()
+      vim.g.slime_target = "tmux"
+      vim.g.slime_default_config = { socket_name = "default", target_pane = "{last}" }
+      vim.g.slime_dont_ask_default = 1
+    end,
+  },
 
   -- git
   {
@@ -10,7 +17,7 @@ return {
     cmd = { "Git", "G", "Gdiffsplit", "Gvdiffsplit", "Gread", "Gwrite", "GBrowse" },
   },
 
-  -- terraform (fmt on save, alignment)
+  -- terraform
   { "hashivim/vim-terraform", ft = { "terraform", "hcl" } },
 
   -- ansible
