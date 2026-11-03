@@ -1,5 +1,6 @@
 vim.g.base46_cache = vim.fn.stdpath "data" .. "/base46/"
-vim.g.mapleader = " "
+vim.g.mapleader = " "       -- NvChad's mappings assume <space>
+vim.g.maplocalleader = ","  -- your old ',' mappings live here
 
 -- bootstrap lazy and all plugins
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
@@ -13,7 +14,7 @@ vim.opt.rtp:prepend(lazypath)
 
 local lazy_config = require "configs.lazy"
 
--- load plugins
+-- load plugins (your own plugins now live in lua/plugins/*.lua)
 require("lazy").setup({
   {
     "NvChad/NvChad",
@@ -21,7 +22,6 @@ require("lazy").setup({
     branch = "v2.5",
     import = "nvchad.plugins",
   },
-  { 'jpalardy/vim-slime' },
   { import = "plugins" },
 }, lazy_config)
 
@@ -31,18 +31,10 @@ dofile(vim.g.base46_cache .. "statusline")
 
 require "options"
 require "nvchad.autocmds"
-require "slime" 
+require "autocmds"
+require "slime"
 
+-- mappings load after NvChad's, so yours win any conflict
 vim.schedule(function()
   require "mappings"
 end)
-
--- Normal and Visual mode deletions to black hole
-vim.keymap.set({'n', 'x'}, 'd', '"_d')
-vim.keymap.set({'n', 'x'}, 'D', '"_D')
-vim.keymap.set({'n', 'x'}, 'c', '"_c')
-vim.keymap.set({'n', 'x'}, 'C', '"_C')
-vim.keymap.set({'n', 'x'}, 'x', '"_x')
-
--- relative line number
-vim.opt.relativenumber = true
