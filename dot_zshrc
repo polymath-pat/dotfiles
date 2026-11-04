@@ -43,13 +43,13 @@ zle -N zle-line-init
 
 # keychain ssh-agent support
 function unchain() {
-    if [ -f "${HOME}/.keychain/${HOSTNAME}-sh" ]; then
-        source "${HOME}/.keychain/${HOSTNAME}-sh"
+    if [ -f "${HOME}/.keychain/MBP-Patrick-Cantu-sh" ]; then
+        source "${HOME}/.keychain/MBP-Patrick-Cantu-sh"
     else
         keychain ~/.ssh/crusoe_cloud_gitlab
         keychain ~/.ssh/crusoe_cloud_pcantu
         keychain ~/.ssh/crusoe_polymath_pat
-        source "${HOME}/.keychain/${HOSTNAME}-sh"
+        source "${HOME}/.keychain/MBP-Patrick-Cantu-sh"
     fi
 }
 
