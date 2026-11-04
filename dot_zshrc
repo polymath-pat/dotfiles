@@ -41,7 +41,19 @@ function zle-line-init {
 }
 zle -N zle-line-init
 
-# Add $VIMODE to your prompt (example)
+# keychain ssh-agent support
+function unchain() {
+    if [ -f "${HOME}/.keychain/${HOSTNAME}-sh" ]; then
+        source "${HOME}/.keychain/${HOSTNAME}-sh"
+    else
+        keychain ~/.ssh/crusoe_cloud_gitlab
+        keychain ~/.ssh/crusoe_cloud_pcantu
+        keychain ~/.ssh/crusoe_polymath_pat
+        source "${HOME}/.keychain/${HOSTNAME}-sh"
+    fi
+}
+
+# Add $VIMODE to your prompt (example).
 #setopt PROMPT_SUBST
 #PROMPT='${VIMODE} %n@%m %~ '
 
