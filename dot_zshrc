@@ -1,3 +1,8 @@
+#
+# CHEZMOI MANAGED FILE! DO NOT DIRECTLY EDIT!
+# Execute: chezmoi edit ~/.zshrc
+#
+
 export EDITOR="nvim"
 export VISUAL="nvim"
 zstyle :zle:edit-command-line editor nvim '+:set ft=zsh'
@@ -11,6 +16,7 @@ bindkey -M viins "^?" backward-delete-char
 export PATH=$PATH:~/bin
 
 # crusoe cloud-admin
+source <(cloud-admin completion zsh)
 alias ca='cloud-admin'
 
 # kubectl shell completion
