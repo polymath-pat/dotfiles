@@ -1,8 +1,3 @@
-#
-# CHEZMOI MANAGED FILE! DO NOT DIRECTLY EDIT!
-# Execute: chezmoi edit ~/.zshrc
-#
-
 export EDITOR="nvim"
 export VISUAL="nvim"
 zstyle :zle:edit-command-line editor nvim '+:set ft=zsh'
@@ -10,29 +5,35 @@ autoload -Uz edit-command-line
 autoload -U compinit; compinit
 zle -N edit-command-line
 bindkey -M vicmd 'v' edit-command-line
+# updates backspace to actually backspace
 bindkey -M viins "^?" backward-delete-char
+
+# Maximum lines kept in memory
+export HISTSIZE=100000
+# Maximum lines saved to $HISTFILE
+export SAVEHIST=100000
 
 # Updated PATH
 export PATH=$PATH:~/bin
 
 # crusoe cloud-admin
-source <(cloud-admin completion zsh)
+source ~/.config/zsh/_cloud-admin.zsh
 alias ca='cloud-admin'
 
 # kubectl shell completion
-source <(kubectl completion zsh)
+source ~/.config/zsh/_k8s.zsh
 alias k='kubectl'
 
 # Enable Vi mode
 bindkey -v
 export KEYTIMEOUT=1
 
-# Define mode indicators
+# Define vi mode indicators
 VIMODE_INS="[+]"
 VIMODE_CMD="[-]"
 VIMODE=$VIMODE_INS
 
-# Function to update mode on keymap change
+# Function to update vi mode on keymap change
 function zle-keymap-select {
   VIMODE="${${KEYMAP/vicmd/$VIMODE_CMD}/(main|viins)/$VIMODE_INS}"
   [[ $KEYMAP == vicmd ]] && echo -ne '\e[2 q' || echo -ne '\e[6 q'
@@ -40,7 +41,7 @@ function zle-keymap-select {
 }
 zle -N zle-keymap-select
 
-# Reset to insert mode for new lines
+# Reset to insert vi mode for new lines
 function zle-line-init {
   VIMODE=$VIMODE_INS
   zle reset-prompt
