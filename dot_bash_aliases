@@ -1,0 +1,88 @@
+# ~/.bash_aliases
+# ============================================================================
+
+# --- Shell Mode ----------------------------------------------------------------
+set -o vi
+bind -m vi-insert "\C-l":clear-screen
+stty -ixon -ixoff                          # disable ctrl-s / ctrl-q flow control
+
+# --- Exports -------------------------------------------------------------------
+export EDITOR=nvim
+export VISUAL="$EDITOR"
+export SUDO_EDITOR="$EDITOR"
+export FCEDIT="$EDITOR"
+export PAGER=less
+
+export HISTCONTROL=ignoredups:erasedups:ignorespace
+export HISTSIZE=10000
+export HISTFILESIZE=10000
+
+export GNUPGHOME="${HOME}/.gnupg"
+export PINENTRY_USER_DATA="USE_CURSES=1"
+
+export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel'
+
+# --- Shell Options -------------------------------------------------------------
+shopt -s histappend                         # append to history, don't overwrite
+
+# --- PATH ----------------------------------------------------------------------
+for dir in "${HOME}/bin" "${HOME}/.local/bin"; do
+    if [ -d "$dir" ]; then
+        case ":${PATH}:" in
+            *:"$dir":*) ;;                  # already in PATH
+            *) PATH="${PATH}:${dir}" ;;
+        esac
+    fi
+done
+unset dir
+
+# --- Aliases -------------------------------------------------------------------
+alias ls='ls --color=auto'
+alias psc='ps xawf -eo pid,user,cgroup,args'
+alias ssh='TERM=screen-256color ssh'        # fix: removed && (was broken)
+alias view='nvim -R'
+alias xcb='xclip -i -selection clipboard'
+alias claude-sandbox='distrobox enter claude-dev -- claude'
+
+function unchain() {
+    if [ -f "${HOME}/.keychain/${HOSTNAME}-sh" ]; then
+        source "${HOME}/.keychain/${HOSTNAME}-sh"
+    fi
+    keychain ~/.ssh/terrific
+}
+
+# --- Git Branch in Prompt ------------------------------------------------------
+# Your original function works well. Keeping it for portability.
+find_git_branch() {
+    local dir=. head
+    until [ "$dir" -ef / ]; do
+        if [ -f "$dir/.git/HEAD" ]; then
+            head=$(< "$dir/.git/HEAD")
+            if [[ $head == ref:\ refs/heads/* ]]; then
+                git_branch=" ${head#*/*/}"
+            elif [[ $head != '' ]]; then
+                git_branch=' (detached)'
+            else
+                git_branch=' (unknown)'
+            fi
+            return
+        fi
+        dir="../$dir"
+    done
+    git_branch=''
+}
+
+# --- Prompt --------------------------------------------------------------------
+green=$'\e[1;32m'
+magenta=$'\e[1;35m'
+normal=$'\e[m'
+
+PROMPT_COMMAND="find_git_branch; $PROMPT_COMMAND"
+PS1="\[$green\]\h:\w\[$magenta\]\$git_branch\[$green\]\n\\$\[$normal\] "
+
+# --- Completions ---------------------------------------------------------------
+source <(kubectl completion bash) 2>/dev/null
+alias k=kubectl
+complete -o default -F __start_kubectl k
+
+complete -C '/usr/local/bin/aws_completer' aws 2>/dev/null
