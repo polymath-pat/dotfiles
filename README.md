@@ -8,7 +8,8 @@ Configuration files:
 .
 ├── dot_bash_aliases
 ├── dot_inputrc
-├── dot_tmux.conf
+├── dot_tmux.conf.tmpl
+├── dot_zshrc.tmpl
 ├── private_dot_config
 │   └── nvim
 │       ├── init.lua
