@@ -1,5 +1,6 @@
 export EDITOR="nvim"
 export VISUAL="nvim"
+export PAGER="nvimpager"
 zstyle :zle:edit-command-line editor nvim '+:set ft=zsh'
 autoload -Uz edit-command-line
 autoload -U compinit; compinit
@@ -16,9 +17,11 @@ export SAVEHIST=100000
 # Updated PATH
 export PATH=$PATH:~/bin
 
+{{ if eq .profile "work" -}}
 # crusoe cloud-admin
 source ~/.config/zsh/_cloud-admin.zsh
 alias ca='cloud-admin'
+{{ end -}}
 
 # kubectl shell completion
 source ~/.config/zsh/_k8s.zsh
@@ -48,6 +51,7 @@ function zle-line-init {
 }
 zle -N zle-line-init
 
+{{ if eq .profile "work" -}}
 # keychain ssh-agent support
 function unchain() {
     if [ -f "${HOME}/.keychain/MBP-Patrick-Cantu-sh" ]; then
@@ -59,6 +63,7 @@ function unchain() {
         source "${HOME}/.keychain/MBP-Patrick-Cantu-sh"
     fi
 }
+{{ end -}}
 
 # Add $VIMODE to your prompt (example).
 #setopt PROMPT_SUBST
